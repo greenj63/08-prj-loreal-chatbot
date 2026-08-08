@@ -3,7 +3,7 @@ const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
 const chatWindow = document.getElementById("chatWindow");
 
-// Worker URL
+// Chatbot fetch URL
 const workerURL = "https://loreal-chatbot.jgreene6801.workers.dev/";
 
 // System message
