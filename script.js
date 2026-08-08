@@ -81,6 +81,10 @@ function sendMessage() {
   // Save the user message
   const userMsg = userInput.value;
 
+  // Clear input and chatbox
+  userInput.value = "";
+  chatWindow.innerHTML = "";
+
   // place the user message in a bubble within the chatbox
   addUserMessage(userMsg);
 
