@@ -109,7 +109,7 @@ function addUserMessage(msg) {
   // generate a message bubble
   const bubble = document.createElement("p");
   bubble.classList.add("bubble");
-  bubble.textContent = msg;
+  bubble.innerHTML = stylizeToHTML(msg);
 
   // put elements inside the chatbox
   userMessages.appendChild(bubble);
@@ -133,7 +133,7 @@ async function addAssistantMessage(msg) {
   // generate an assistant reply bubble
   const bubble = document.createElement("p");
   bubble.classList.add("bubble");
-  bubble.textContent = msg;
+  bubble.innerHTML = stylizeToHTML(msg);
 
   // put elements inside the chatbox
   assistantMessages.appendChild(bubble);
@@ -209,4 +209,30 @@ function addThinkingMessage() {
 
   // store interval id so remove can clear it
   wrapper._thinkingIntervalId = intervalId;
+}
+
+// Converts text to HTML code with appropriate styling.
+// ** -> bold
+// *  -> italic
+// __ -> underlined
+function stylizeToHTML(txt) {
+  if (!txt || typeof txt !== "string") return txt;
+
+  // Replace bold (**text**) first
+  // Use non-greedy match so multiple pairs are handled
+  txt = txt.replace(/\*\*(.+?)\*\*/g, (m, p1) => {
+    return `<span class="stylized-bold">${p1}</span>`;
+  });
+
+  // Then replace italic (*text*)
+  txt = txt.replace(/\*(.+?)\*/g, (m, p1) => {
+    return `<span class="stylized-italic">${p1}</span>`;
+  });
+
+  // Finally replace underline (__text__)
+  txt = txt.replace(/__(.+?)__/g, (m, p1) => {
+    return `<span class="stylized-underline">${p1}</span>`;
+  });
+
+  return txt;
 }

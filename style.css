@@ -216,3 +216,16 @@ body {
   transform: scale(1.18);
   filter: brightness(1.35);
 }
+
+/* Message styles */
+.stylized-bold {
+  font-weight: bold;
+}
+
+.stylized-italic {
+  font-style: italic;
+}
+
+.stylized-underline {
+  text-decoration: underline;
+}
