@@ -41,7 +41,8 @@ body {
 }
 
 .chat-window {
-  height: 360px;
+  height: fit-content;
+  min-height: 360px;
   border: 1px solid #000;
   padding: 20px;
   font-size: 18px;
