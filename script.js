@@ -17,10 +17,13 @@ const directions = {
 const messages = JSON.parse(localStorage.getItem("chatHistory")) || [
   directions,
 ];
-console.log(messages);
 
 // Set initial message
-addAssistantMessage("👋 Hello! How can I help you today?");
+addThinkingMessage();
+setTimeout(() => {
+  removeThinkingMessage();
+  addAssistantMessage("👋 Hello! How can I help you today?");
+}, 600);
 
 /* Handle form submit */
 chatForm.addEventListener("submit", (e) => {
@@ -74,22 +77,23 @@ async function generateResponse(msg) {
   return "Error generating reply. Please try again later";
 }
 
-async function sendMessage() {
+function sendMessage() {
   // Save the user message
   const userMsg = userInput.value;
 
   // place the user message in a bubble within the chatbox
   addUserMessage(userMsg);
 
-  // get the chatbot reply
-  addThinkingMessage();
-  const reply = await generateResponse(userMsg);
+  // wait for a short amount of time before reply for realism
+  setTimeout(async () => {
+    // get the chatbot reply
+    addThinkingMessage();
+    const reply = await generateResponse(userMsg);
 
-  // Add an assistant chat bubble with the reply
-  removeThinkingMessage();
-  addAssistantMessage(reply);
-
-  console.log(reply);
+    // Add an assistant chat bubble with the reply
+    removeThinkingMessage();
+    addAssistantMessage(reply);
+  }, 700);
 }
 
 // Generates a user message bubble with the content stored in msg
@@ -105,19 +109,22 @@ function addUserMessage(msg) {
 
   // put elements inside the chatbox
   userMessages.appendChild(bubble);
+  // start in the "enter" state then trigger the show state for animation
+  userMessages.classList.add("enter");
   chatWindow.appendChild(userMessages);
+
+  // trigger the transition on the next frame
+  requestAnimationFrame(() => {
+    userMessages.classList.add("show");
+    userMessages.classList.remove("enter");
+  });
 }
 
 // Generates an assistant message bubble with the content stored in msg
-async function addAssistantMessage(msg, classes = null) {
+async function addAssistantMessage(msg) {
   // generate an assistant messages section
   const assistantMessages = document.createElement("div");
   assistantMessages.classList.add("messages", "ai");
-
-  // add special classes to the message
-  if (classes != null) {
-    assistantMessages.classList.add(classes);
-  }
 
   // generate an assistant reply bubble
   const bubble = document.createElement("p");
@@ -126,17 +133,76 @@ async function addAssistantMessage(msg, classes = null) {
 
   // put elements inside the chatbox
   assistantMessages.appendChild(bubble);
-  chatWindow.appendChild(assistantMessages);
-}
 
-// Adds a thinking message bubble for the AI
-function removeThinkingMessage() {
-  // select the first thinking message and remove it
-  document.querySelector(".thinking-msg").remove();
+  // start in the "enter" state then trigger the show state for animation
+  assistantMessages.classList.add("enter");
+  chatWindow.appendChild(assistantMessages);
+
+  // trigger the transition on the next frame
+  requestAnimationFrame(() => {
+    assistantMessages.classList.add("show");
+    assistantMessages.classList.remove("enter");
+  });
 }
 
 // Removes the AI thinking message bubble
-function addThinkingMessage() {
-  addAssistantMessage(". . .", "thinking-msg");
+function removeThinkingMessage() {
+  // select the first thinking message and remove it
+  const el = document.querySelector(".thinking-msg");
+  if (!el) return;
+  // stop interval if present
+  const intervalId = el._thinkingIntervalId;
+  if (intervalId) clearInterval(intervalId);
+  el.remove();
+}
 
+// Adds a thinking message bubble for the AI
+function addThinkingMessage() {
+  // create the thinking element with per-letter spans
+  const text = ". . .";
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("messages", "ai", "thinking-msg");
+
+  const bubble = document.createElement("p");
+  bubble.classList.add("bubble");
+
+  const thinking = document.createElement("span");
+  thinking.classList.add("thinking");
+
+  // create a span per letter
+  for (let i = 0; i < text.length; i++) {
+    const span = document.createElement("span");
+    span.classList.add("letter");
+    span.textContent = text[i];
+    thinking.appendChild(span);
+  }
+
+  bubble.appendChild(thinking);
+  wrapper.appendChild(bubble);
+
+  // start in the "enter" state then trigger the show state for animation
+  wrapper.classList.add("enter");
+  chatWindow.appendChild(wrapper);
+
+  requestAnimationFrame(() => {
+    wrapper.classList.add("show");
+    wrapper.classList.remove("enter");
+  });
+
+  // animate letters in sequence
+  const letters = thinking.querySelectorAll(".letter");
+  let idx = 0;
+  // ensure at least one letter
+  if (letters.length === 0) return;
+
+  const intervalId = setInterval(() => {
+    // remove active from previous
+    letters.forEach((l) => l.classList.remove("active"));
+    // set active on current
+    letters[idx].classList.add("active");
+    idx = (idx + 1) % letters.length;
+  }, 260);
+
+  // store interval id so remove can clear it
+  wrapper._thinkingIntervalId = intervalId;
 }
