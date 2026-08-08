@@ -44,6 +44,8 @@ body {
   overflow-y: auto;
   background: #fafafa;
   white-space: pre-line;
+  display: flex;
+  flex-direction: column;
 }
 
 /* messages */
@@ -140,4 +142,34 @@ body {
 
 .site-footer a:hover {
   color: #666666;
+}
+
+/* Chatbox messages */
+.messages {
+  padding: 3px;
+  margin: 8px;
+  max-width: 80%;
+}
+
+.messages.user {
+  margin-left: auto;
+}
+
+.messages.ai {
+  align-items: start;
+}
+
+.bubble {
+  width: fit-content;
+  background-color: rgba(128, 128, 128, 0.2);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.messages.user .bubble {
+  border-bottom-right-radius: 2px;
+}
+
+.messages.ai .bubble {
+  border-bottom-left-radius: 2px;
 }
